@@ -1,0 +1,51 @@
+name: Commit Latest Top Five from Chadsoft API
+
+on:
+  schedule:
+    - cron: "5 18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update_recent_runs:
+    name: Update 200CTGP
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout main
+      uses: actions/checkout@v3
+      with:
+        ref: main
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Generate 200CTGP json
+      run: node fetch-200CTGP.js
+
+    - name: Stash 200CTGP
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add Backup_200CTGP.json
+        git add Records_200CTGP.json
+        git stash
+
+    - name: Checkout gh-pages
+      uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+      
+    - name: Commit 200CTGPs json to gh-pages
+      run: |
+        git stash apply || true
+        git checkout --theirs Backup_200CTGP.json
+        git add Backup_200CTGP.json
+        git checkout --theirs Records_200CTGP.json
+        git add Records_200CTGP.json
+        git commit -m "Update 200CTGP - $(date '+%Y-%m-%d %H:%M') UTC"
+        git push origin HEAD:gh-pages
