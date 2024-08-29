@@ -1,9 +1,8 @@
-name: Commit Latest Top Five from Chadsoft API
+name: Commit 200CTGP json from Chadsoft API
 
 on:
   schedule:
-    - cron: "5 18 * * *"
-  workflow_dispatch:
+    - cron: '5 13,22 * * *'
 
 permissions:
   contents: write
