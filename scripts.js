@@ -8,7 +8,6 @@ largeCategories = ["Jungle Jamble","Undiscovered Offlimit","White Garden","Wetla
 //array to fetch more ghosts for top 10 LBs, category is large if top 10 ghosts are not within first 100 entries
 //must be manually inputed, it is logged in console during execution for easy knowledge
 
-//let urlList = [], categories = [], trackIds = []; //trackIds and categories arrays are used to find data in first mainLB fetch because not all leaderboards are fetched afterwards
 const leaderboardsURLS = {
   '150CTGP': 'https://tt.chadsoft.co.uk/ctgp-leaderboards.json',
   '200CTGP': 'https://tt.chadsoft.co.uk/ctgp-leaderboards-200cc.json',
@@ -70,7 +69,7 @@ function loadLeaderboard(currentPage) {
   }
   fetch(load1).then(mainRes => {mainRes.json().then(mainLB =>{this.mainLB = mainLB;
 
-  fetch(load2).then(mainRes => {mainRes.json().then(results => {this.results = results;
+    fetch(load2).then(mainRes => {mainRes.json().then(results => {this.results = results;
 
       fetch('./players.json').then(mainRes => {mainRes.json().then(playersPage => {this.playersPage = playersPage;
 
@@ -89,7 +88,7 @@ function loadLeaderboard(currentPage) {
         let index = `${j}`;
         let category = determineCategory(mainLB,j,index);
         if (category==="Slower-Glitch") { //prevent slow glitches and slow shortcuts from displaying by not adding them to the fetch array
-          console.log(mainLB["leaderboards"][`${i}`]["name"] + "Slow glitch");
+          console.log(mainLB["leaderboards"][`${j}`]["name"] + "Slow glitch");
           continue;
         }
 
@@ -208,9 +207,6 @@ function loadLeaderboard(currentPage) {
       controllerTally.sort(sortNodeByQuantity); playerTally.sort(sortNodeByQuantity); 
       glitchTally.sort(sortNodeByQuantity); noGlitchTally.sort(sortNodeByQuantity);
       allYears.sort(sortNodeByName);
-      //wheelPlayers.sort(sortNodeByQuantity); gamecubePlayers.sort(sortNodeByQuantity);
-      //classicPlayers.sort(sortNodeByQuantity); nunchukPlayers.sort(sortNodeByQuantity);
-      //numeric sorting
 
       document.getElementById("totalPlayerCount").textContent=`Individual Record Holders: ${playerTally.length+unknownPeople}`;
       document.getElementById("totalPlayerCountDupe").textContent=`Total Record Holders: ${playerTally.length+unknownPeople}`;
@@ -243,25 +239,15 @@ function loadLeaderboard(currentPage) {
   })
     .catch((err) => {
       console.log(err);
-      console.log("Fatal Error in logic");
+      console.log(`Internal Error Occured. Please try again at ${(new Date('August 28, 2024 22:00:00')).toLocaleTimeString()}`);
   });
 }).catch((err) => {
   console.log(err);
-  alert("Main database hasn't responded, chadsoft server is most likely down or running too slow, Try again later.")
+  alert(`Internal Error Occured. Please try again at ${(new Date('August 28, 2024 22:00:00')).toLocaleTimeString()}`);
 })
 }) //tag closures from original fetch statement
 })}
 
-function convertUTCDateToLocalDate(date) {
-  var newDate = new Date(date.getTime()-date.getTimezoneOffset()*60*1000);
-
-  var offset = date.getTimezoneOffset() / 60;
-  var hours = date.getHours();
-
-  //newDate.setHours(hours - offset);
-
-  return newDate;   
-}
 
 /*****************************************************************************/
 /*                              PlayerID Lookup                              */
@@ -899,6 +885,80 @@ function createTableHeader11(row,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11) {
   cellt9.innerHTML=t9;
   cellt10.innerHTML=t10;
   cellt11.innerHTML=t11;
+}
+
+/** Html Table Search Function */
+function searchTable() {
+  // Declare variables
+  let input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("main");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 1; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+        continue;
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+    td = tr[i].getElementsByTagName("td")[1];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+        continue;
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+    td = tr[i].getElementsByTagName("td")[3];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+        continue;
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+    td = tr[i].getElementsByTagName("td")[6];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+        continue;
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+    td = tr[i].getElementsByTagName("td")[7];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+        continue;
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+    td = tr[i].getElementsByTagName("td")[8];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+        continue;
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
 }
 
 
