@@ -24,7 +24,7 @@ jobs:
         node-version: '20'
 
     - name: Generate 200CTGP json
-      run: node fetch-200CTGP.js
+      run: node node-scripts/fetch-200CTGP.js
 
     - name: Stash 200CTGP
       run: |
@@ -42,9 +42,9 @@ jobs:
     - name: Commit 200CTGPs json to gh-pages
       run: |
         git stash apply || true
-        git checkout --theirs Backup_200CTGP.json
-        git add Backup_200CTGP.json
-        git checkout --theirs Records_200CTGP.json
-        git add Records_200CTGP.json
+        git checkout --theirs .
+        mv Backup_200CTGP.json data/Backup_200CTGP.json
+        mv Records_200CTGP.json data/Records_200CTGP.json
+        git add --all
         git commit -m "Update 200CTGP - $(date '+%Y-%m-%d %H:%M') UTC"
         git push origin HEAD:gh-pages
