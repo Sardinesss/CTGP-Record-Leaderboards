@@ -1,7 +1,6 @@
 name: Commit 150CTGP json from Chadsoft API
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: '0 13,22 * * *'
 
