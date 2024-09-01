@@ -59,13 +59,13 @@ function loadLeaderboard(currentPage) {
   buildRecordWebpage();
   let load1, load2;
   if (currentPage==="records") {
-    load1='./Backup_150CTGP.json', load2='./Records_150CTGP.json';
+    load1='./data/Backup_150CTGP.json', load2='./data/Records_150CTGP.json';
   }
   else if (currentPage==="recordstwo") {
-    load1='./Backup_200CTGP.json', load2='./Records_200CTGP.json';
+    load1='./data/Backup_200CTGP.json', load2='./data/Records_200CTGP.json';
   }
   else {
-    load1='./Backup_200Nin.json', load2='./Records_200Nin.json';
+    load1='./data/Backup_200Nin.json', load2='./data/Records_200Nin.json';
   }
   fetch(load1).then(mainRes => {mainRes.json().then(mainLB =>{this.mainLB = mainLB;
 
