@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="keywords" content="Sardine,MKW,BKT,custom">
+        <meta name="author" content="Sardine">
+        <meta name="description" content="Sardine Homepage">
+        <title>CTGP Player Finder</title>
+        <link href="styles.css" rel="stylesheet" type="text/css">
+        <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    </head>
+    <body onload="createPageHeader('playerlookup')">
+        <button class="darkmode-toggle" onclick="toggleDarkMode()">
+            <div>
+                <p id="darkmode-text">Dark Mode</p>
+                <img src="images/darkmode.svg"/>
+            </div>
+        </button>
+        <header></header>
+        <p> Many former and most current record holders can get their playerID and chadsoft players page link(s) by inputting their name. </p><b>
+        <a href="players.json" target="_blank">Want to see the Raw Data?</a><br>
+        <label for="playerName">Input Name Here:</label><br>
+        <input type="text" id="playerName" name="playerName"><br>
+        <input type="button" onclick="PlayersPageAndPIDbyPlayerName()" value="Search"><br>
+        <script src="scripts.js"></script>
+    </body>
+</html>
