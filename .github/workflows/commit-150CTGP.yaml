@@ -43,6 +43,7 @@ jobs:
       run: |
         git stash apply || true
         git checkout --theirs .
+        mkdir -p data
         mv Backup_150CTGP.json data/Backup_150CTGP.json
         mv Records_150CTGP.json data/Records_150CTGP.json
         git add --all
