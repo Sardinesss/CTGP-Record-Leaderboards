@@ -24,7 +24,7 @@ jobs:
         node-version: '20'
 
     - name: Generate 200Nin json
-      run: node fetch-200Nin.js
+      run: node node-scripts/fetch-200Nin.js
 
     - name: Stash 200Nin
       run: |
@@ -42,9 +42,10 @@ jobs:
     - name: Commit 200Nins json to gh-pages
       run: |
         git stash apply || true
-        git checkout --theirs Backup_200Nin.json
-        git add Backup_200Nin.json
-        git checkout --theirs Records_200Nin.json
-        git add Records_200Nin.json
+        git checkout --theirs .
+        mkdir -p data
+        mv Backup_200Nin.json data/Backup_200Nin.json
+        mv Records_200Nin.json data/Records_200Nin.json
+        git add --all
         git commit -m "Update 200Nin - $(date '+%Y-%m-%d %H:%M') UTC"
         git push origin HEAD:gh-pages
