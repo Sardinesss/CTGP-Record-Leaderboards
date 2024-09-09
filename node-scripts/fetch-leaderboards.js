@@ -35,10 +35,10 @@ leaderboards.forEach(async (leaderboard) => {
     console.log(`All ${leaderboard.name} leaderboards fetched successfully.`);
   } else {
     for (let i = 0; i < FETCH_RETRIES_MAX; i++) {
-      console.log(`Some ${leaderboard.name} leaderboards failed to fetch. Retrying (${i+1}/${FETCH_RETRIES_MAX})...`);
+      console.log(`Some ${leaderboard.name} leaderboards failed to fetch. Retrying (${i+1}/${FETCH_RETRIES_MAX}).`);
 
       const retryPromises = rejectedResults.map(res => fetch(res.reason.url).then(res => res.json().catch(err => {err.url = url; throw err;})));
-      console.log(`Refetching ${retryPromises.length} individual ${leaderboard.name} leaderboards`);
+      console.log(`Refetching ${retryPromises.length} individual ${leaderboard.name} leaderboards...`);
       const retryResults = await Promise.allSettled(retryPromises);
 
       retryResults.forEach((newResult) => {
@@ -64,7 +64,6 @@ leaderboards.forEach(async (leaderboard) => {
       console.log(`${rejectedResults.length} ${leaderboard.name} leaderboards failed to fetch after ${FETCH_RETRIES_MAX} attempts.`);
     }
   }
-  
 
   const backupJson = {
     leaderboards: data["leaderboards"],
