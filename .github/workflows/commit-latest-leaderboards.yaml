@@ -1,15 +1,15 @@
-name: Commit 200CTGP json from Chadsoft API
+name: Commit the latest leaderboards from ChadSoft API
 
 on:
   schedule:
-    - cron: '5 13,22 * * *'
+    - cron: '0 13,22 * * *'
 
 permissions:
   contents: write
 
 jobs:
-  update_recent_runs:
-    name: Update 200CTGP
+  commit_latest_leaderboards:
+    name: Commit the latest leaderboards from ChadSoft API
     runs-on: ubuntu-latest
 
     steps:
@@ -23,15 +23,14 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Generate 200CTGP json
-      run: node node-scripts/fetch-200CTGP.js
+    - name: Get the latest leaderboards from ChadSoft API
+      run: node node-scripts/fetch-leaderboards.js
 
-    - name: Stash 200CTGP
+    - name: Stash JSON files
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add Backup_200CTGP.json
-        git add Records_200CTGP.json
+        git add --all
         git stash
 
     - name: Checkout gh-pages
@@ -39,13 +38,17 @@ jobs:
       with:
         ref: gh-pages
       
-    - name: Commit 200CTGPs json to gh-pages
+    - name: Commit JSON files to gh-pages
       run: |
         git stash apply || true
         git checkout --theirs .
         mkdir -p data
+        mv Backup_150CTGP.json data/Backup_150CTGP.json
+        mv Records_150CTGP.json data/Records_150CTGP.json
         mv Backup_200CTGP.json data/Backup_200CTGP.json
         mv Records_200CTGP.json data/Records_200CTGP.json
+        mv Backup_200NIN.json data/Backup_200NIN.json
+        mv Records_200NIN.json data/Records_200NIN.json
         git add --all
-        git commit -m "Update 200CTGP - $(date '+%Y-%m-%d %H:%M') UTC"
+        git commit -m "Update leaderboards - $(date '+%Y-%m-%d %H:%M') UTC"
         git push origin HEAD:gh-pages
