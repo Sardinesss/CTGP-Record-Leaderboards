@@ -88,7 +88,7 @@ function loadLeaderboard(currentPage) {
         let index = `${j}`;
         let category = determineCategory(mainLB,j,index);
         if (category==="Slower-Glitch") { //prevent slow glitches and slow shortcuts from displaying by not adding them to the fetch array
-          console.log(mainLB["leaderboards"][`${j}`]["name"] + "Slow glitch");
+          console.log(mainLB["leaderboards"][`${j}`]["name"] + " Slow glitch");
           continue;
         }
 
@@ -219,7 +219,7 @@ function loadLeaderboard(currentPage) {
       displayPie("country",countryTally); //Pie charts
 
       displayTopTen(orderedDuration);
-      displayControllerTable("controllerList",controllerTally,"Controller","Total Records","% of Records","% of Unique Players",playerTally.length+unknownPeople,allDates.length);
+      displayControllerTable("controllerList",controllerTally,"Controller","Total Records","Percentage","% of Players",playerTally.length+unknownPeople,allDates.length);
       displayTableWithPictures("playerList",playerTally,"Player Name","Total Records","Nation");
       displayTableWithPictures("glitchList",glitchTally,"Player Name","Total Records","Nation");
       displayTableWithPictures("noGlitchList",noGlitchTally,"Player Name","Total Records","Nation");
@@ -655,8 +655,8 @@ function buildRecordWebpage() {
 
   mainDiv = document.createElement("div");
   mainDiv.className = "grid-container";
+  mainDiv.appendChild(createTableChartDiv("country"));
   mainDiv.appendChild(createTableChartDiv("vehicle"));
-  mainDiv.appendChild(createTableChartDiv("character"));
   controllerDiv = document.createElement("div");
   controllerDiv.appendChild(createHeaderTwo(tableInfo["controller"]["header"]));
   let controllerWarning = document.createElement("p");
@@ -668,7 +668,7 @@ function buildRecordWebpage() {
   subdiv.appendChild(createTable("controller"));
   controllerDiv.appendChild(subdiv);
   mainDiv.appendChild(controllerDiv);
-  mainDiv.appendChild(createTableChartDiv("country"));
+  mainDiv.appendChild(createTableChartDiv("character"));
   document.body.appendChild(mainDiv);
 
   chronoDiv = document.createElement("div");
@@ -708,6 +708,7 @@ function createPageHeader(currentPage) {
   let navBar = document.createElement("nav");
   let funkyImage = createImage("images/funky.webp");
   funkyImage.height = 100;
+  funkyImage.width = 112.78;
   navBar.appendChild(funkyImage);
   navDiv = document.createElement("div");
   redirectList = createHeaderHyperLinks(currentPage);
@@ -717,6 +718,7 @@ function createPageHeader(currentPage) {
   navBar.appendChild(navDiv);
   let warioImage = createImage("images/wario.webp");
   warioImage.height = 100;
+  warioImage.width = 83.05;
   navBar.appendChild(warioImage);
   header[0].appendChild(navBar);
   header[0].appendChild(document.createElement("hr"));
@@ -769,13 +771,13 @@ function createTableHeaderDiv(index) {
   return div;
 }
 
-/** create html image object, height is set to 32
+/** create html image object, width is set to 32
  * @param {string} pictureName format="images/XX.png"
  * @returns html image node */
 function createImage(pictureName) {
   let image = document.createElement('img');
   image.src = pictureName;
-  image.height = 32;
+  image.width = 32;
   return image;
 }
 
@@ -1144,7 +1146,9 @@ function displayPie(tableIndex,dataset) {
   }
 
   let options = {
-    chart: {type: 'pie',width: 450},
+    chart: {type: 'pie'
+      ,width: 420
+    },
     colors: chartColors,
     labels: titles,
     legend: {
@@ -1176,6 +1180,7 @@ function displayBar(tableIndex,dataset,x) {
       //name: `Current Records set in this ${tableInfo[tableIndex]["tooltip"]}`,
       data: dataset
     }],
+    states: {active: {filter: {type: 'none'}}},
     tooltip: {enabled: false},
     xaxis: {
       categories: x,
@@ -1233,8 +1238,8 @@ function displayControllerTable(tableName,dataset,title1,title2,title3,title4,to
     }
     cell1.innerHTML = dataset[playerIndex].getName();
     cell2.innerHTML = dataset[playerIndex].getQuantity();
-    cell3.innerHTML = ((dataset[playerIndex].getQuantity()/totalRecords) * 100).toFixed(1);
-    cell4.innerHTML = (((getControllerArray(dataset[playerIndex].getName()).length)/totalPlayers) * 100).toFixed(1); //controller Total/player total times 100, round to 1 decimal point
+    cell3.innerHTML = `${((dataset[playerIndex].getQuantity()/totalRecords) * 100).toFixed(1)}%`;
+    cell4.innerHTML = `${(((getControllerArray(dataset[playerIndex].getName()).length)/totalPlayers) * 100).toFixed(1)}%`; //controller Total/player total times 100, round to 1 decimal point
     multiControllerPlayers+=getControllerArray(dataset[playerIndex].getName()).length;
     dataset.splice(playerIndex,1); //remove displayed table element
     playerIndex = 0;
@@ -1242,7 +1247,7 @@ function displayControllerTable(tableName,dataset,title1,title2,title3,title4,to
   
   let dataRow = infoList.insertRow();
   let finalCell = dataRow.insertCell(0);
-  finalCell.innerHTML = `Number of players who have records with multiple controllers: ${multiControllerPlayers-totalPlayers}`;
+  finalCell.innerHTML = `Number of players holding records with multiple controllers: ${multiControllerPlayers-totalPlayers}`;
   finalCell.colSpan = 4;
 }
 
