@@ -3,8 +3,7 @@
 /*****************************************************************************/
 
 const baseURL = "https://tt.chadsoft.co.uk",  //must use https://
-largeCategories = ["Jungle Jamble","Undiscovered Offlimit","White Garden","Wetland Woods","Sunset Forest","Spectral Station","Obstagoon's Palace",
-                  "Mushroom Island","GCN Mushroom Bridge","Fishdom Island","Colour Circuit","Castle of Time","Castle of Darkness","Camp Kartigan"];
+largeCategories = ["Jungle Jamble","Undiscovered Offlimit","White Garden","Wetland Woods","Sunset Forest","Spectral Station","Obstagoon's Palace","Mushroom Island","GCN Mushroom Bridge","Colour Circuit","Castle of Darkness","Camp Kartigan"];
 //array to fetch more ghosts for top 10 LBs, category is large if top 10 ghosts are not within first 100 entries
 //must be manually inputed, it is logged in console during execution for easy knowledge
 
@@ -71,182 +70,196 @@ function loadLeaderboard(currentPage) {
 
     fetch(load2).then(mainRes => {mainRes.json().then(results => {this.results = results;
 
-      fetch('./players.json').then(mainRes => {mainRes.json().then(playersPage => {this.playersPage = playersPage;
-
-      let infoTitle = document.getElementById('main').getElementsByTagName('thead')[0];
-      createTableHeader11(infoTitle.insertRow(),"Track Name","Category","Time","Player Name","Mii","Nation","Character","Vehicle","Controller","Date","Duration");
-      let myTable = document.getElementById("main").getElementsByTagName('tbody')[0];
-      //create header row and initiate first body row
-
-      let screenName = '', unknownPeople = 0, allDates = [], allYears = [], allRecords = [],
-      vehicleTally = [], characterTally = [], controllerTally = [], playerTally = [], 
-      glitchTally = [], noGlitchTally = [], countryTally = [], orderedDuration = [];
-      //declare arrays
-
-      for (let j=0;j<results.length;j++) {
-
-        let index = `${j}`;
-        let category = determineCategory(mainLB,j,index);
-        if (category==="Slower-Glitch") { //prevent slow glitches and slow shortcuts from displaying by not adding them to the fetch array
-          console.log(mainLB["leaderboards"][`${j}`]["name"] + " Slow glitch");
-          continue;
+      //check for failed fetches in the local data
+      let failedIndices = [], load3 = [];
+      for (let a=0;a<results.length;a++) {
+        if (results[`${a}`]["status"] === "rejected") {
+          failedIndices.push(a);
         }
-
-        let row = myTable.insertRow();
-        let cell1 = row.insertCell(0), cell2 = row.insertCell(1),
-        cell3 = row.insertCell(2), cell4 = row.insertCell(3),
-        cell5 = row.insertCell(4), cell6 = row.insertCell(5),
-        cell7 = row.insertCell(6), cell8 = row.insertCell(7),
-        cell9 = row.insertCell(8), cell10 = row.insertCell(9),
-        cell11 = row.insertCell(10);
-        //One row and 11 columns for each track and category
-
-        if (results[index]["status"] === "rejected") {
-          //display generic track info with main leaderboard if a track leaderboard fails, restarts loop
-          cell1.innerHTML = mainLB["leaderboards"][`${j}`]["name"];
-          cell2.innerHTML = category;
-          cell3.innerHTML = mainLB["leaderboards"][`${j}`]["fastestTimeSimple"].slice(1);
-          cell4.innerHTML = "-";
-          cell5.innerHTML = "Failed";
-          cell6.innerHTML = "to";
-          cell7.innerHTML = "fetch";
-          cell8.innerHTML = "ghost";
-          cell9.innerHTML = "-";
-          cell10.innerHTML = mainLB["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10);
-          cell11.innerHTML = getRecordDuration(mainLB["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10));
-          console.log('Failed Fetching Record for: '+mainLB["leaderboards"][`${j}`]["name"]);
-          allRecords.push(mainLB["leaderboards"][`${j}`]["fastestTimeSimple"]);
-          continue;
-        }
-
-        let currentVehicle=getVehicle(results[index]["value"]["ghosts"]["0"]["vehicleId"]),
-        currentCharacter=getCharacter(results[index]["value"]["ghosts"]["0"]["driverId"]),
-        currentController=getController(results[index]["value"]["ghosts"]["0"]["controller"]),
-        recordDate = results[index]["value"]["ghosts"]["0"]["dateSet"].slice(0,10); //UTC Time Date
-        duration = getRecordDuration(recordDate);
-        //getting strings from switch case statements
-
-        let player = ["Unknown","images/unknown.png"];
-        for (let i=0;i<playersPage.length;i++) {
-          if (playersPage[i].playerID.includes(results[index]["value"]["ghosts"]["0"]["playerId"])) {
-            if (playersPage[i].playerName[0].length === 1) {
-              player = [playersPage[i].playerName,playersPage[i].countryID];
-            }
-            else {
-              player = [playersPage[i].playerName[0],playersPage[i].countryID];
-            }
-            break;
-          }
-        }
-
-        if (player[0]!="Unknown") {
-          //prevent unknown players from being added to player and nation stats table, ghost stats and main record table are still added
-          if (toBeAdded = addToArray(player[0],playerTally)) {
-            playerTally.push(new NameQuantityNode(player[0],1,player[1]))
-          }
-          if (toBeAdded = addToArray(player[1].slice(7,9),countryTally)) {
-            countryTally.push(new NameQuantityNode(player[1].slice(7,9),1,player[1]))
-          }
-          if (category==="Glitch" || category==="Shortcut") {
-            if (toBeAdded = addToArray(player[0],glitchTally)) {glitchTally.push(new NameQuantityNode(player[0],1,player[1]))}
-          }
-          else {
-            if (toBeAdded = addToArray(player[0],noGlitchTally)) {noGlitchTally.push(new NameQuantityNode(player[0],1,player[1]))}
-          }
-          screenName = player[0];
-        }
-        else {
-          console.log("Missing player entry at: "+results[index]["value"]["name"]+": "+category);
-          unknownPeople++; //used for percentage of players controller calculations
-          screenName = checkDefaultMii(results[index]["value"]["ghosts"]["0"]["player"]);
-        }
-
-        allDates.push(recordDate);
-        allRecords.push(results[index]["value"]["fastestTimeSimple"]);
-        orderedDuration.push(new NameQuantityNode(results[index]["value"]["name"]+": "+category,duration,recordDate,player[0]));
-
-        if (toBeAdded = addToArray(recordDate.slice(0,4),allYears)) {
-          allYears.push(new NameQuantityNode(recordDate.slice(0,4),1))
-        }
-        if (toBeAdded = addToArray(currentVehicle,vehicleTally)) {
-          vehicleTally.push(new NameQuantityNode(currentVehicle,1))
-        }
-        if (toBeAdded = addToArray(currentCharacter,characterTally)) {
-          characterTally.push(new NameQuantityNode(currentCharacter,1))
-        }
-
-        if (toBeAdded = addToArray(currentController,controllerTally)) {
-          controllerTally.push(new NameQuantityNode(currentController,1))
-        }
-        if (toBeAdded = addToArray(player[0],getControllerArray(currentController))) {
-          getControllerArray(currentController).push(new NameQuantityNode(player[0],1))
-        }
-        if (currentController==="Gamecube" && results[index]["value"]["ghosts"]["0"]["usbGcnAdapterAttached"]) {
-          currentController="USB Gamecube"; //switch to USB-GCN after stats collection
-        }
-        //add ghost data to arrays
-
-        cell1.innerHTML = results[index]["value"]["name"];
-        cell2.innerHTML = category;
-        //cell3.appendChild(createRKGDownload(results[index]["value"]["ghosts"],"0"));
-        cell3.innerHTML = results[index]["value"]["fastestTimeSimple"].slice(1); //removes initial 0
-        cell4.innerHTML = screenName;
-        cell5.innerHTML = checkDefaultMii(results[index]["value"]["ghosts"]["0"]["player"]);
-        cell6.appendChild(createImage(player[1]));
-        cell7.innerHTML = currentCharacter;
-        cell8.innerHTML = currentVehicle;
-        cell9.innerHTML = currentController;
-        cell10.innerHTML = recordDate;
-        cell11.innerHTML = duration;
       }
 
-      //Begin Stats Section
+      //build a new fetch for only fails
+      for (let b=0;b<failedIndices.length;b++) {
+        load3.push("https://tt.chadsoft.co.uk" + mainLB["leaderboards"][failedIndices[b]]["_links"]["item"]["href"]+'?limit=1');
+      }
+      let fetches = load3.map(url => fetch(url).then(res => res.json()));
 
-      orderedDuration.sort(sortNodeByQuantity); countryTally.sort(sortNodeByQuantity); 
-      vehicleTally.sort(sortNodeByQuantity); characterTally.sort(sortNodeByQuantity);
-      controllerTally.sort(sortNodeByQuantity); playerTally.sort(sortNodeByQuantity); 
-      glitchTally.sort(sortNodeByQuantity); noGlitchTally.sort(sortNodeByQuantity);
-      allYears.sort(sortNodeByName);
+      Promise.allSettled(fetches).then((supplementLB) => {
+        for (let c=0;c<failedIndices.length;c++) {
+          results[failedIndices[c]] = supplementLB[c]; //replace failed fetches with new data
+        }
+        
+        fetch('./players.json').then(mainRes => {mainRes.json().then(playersPage => {this.playersPage = playersPage;
 
-      document.getElementById("totalPlayerCount").textContent=`Individual Record Holders: ${playerTally.length+unknownPeople}`;
-      document.getElementById("totalPlayerCountDupe").textContent=`Total Record Holders: ${playerTally.length+unknownPeople}`;
-      document.getElementById("totalTime").textContent=`Overall Combined Time: ${addGhostTimes(allRecords)}`;
-      document.getElementById("totalCount").textContent=`Total Records: ${allDates.length}`; 
+        let infoTitle = document.getElementById('main').getElementsByTagName('thead')[0];
+        createTableHeader11(infoTitle.insertRow(),"Track Name","Category","Time","Player Name","Mii","Nation","Character","Vehicle","Controller","Date","Duration");
+        let myTable = document.getElementById("main").getElementsByTagName('tbody')[0];
+        //create header row and initiate first body row
 
-      displayPie("vehicle",vehicleTally);
-      displayPie("character",characterTally);
-      displayPie("controller",controllerTally);
-      displayPie("country",countryTally); //Pie charts
+        let screenName = '', unknownPeople = 0, allDates = [], allYears = [], allRecords = [],
+        vehicleTally = [], characterTally = [], controllerTally = [], playerTally = [], 
+        glitchTally = [], noGlitchTally = [], countryTally = [], orderedDuration = [];
 
-      displayTopTen(orderedDuration);
-      displayControllerTable("controllerList",controllerTally,"Controller","Total Records","Percentage","% of Players",playerTally.length+unknownPeople,allDates.length);
-      displayTableWithPictures("playerList",playerTally,"Player Name","Total Records","Nation");
-      displayTableWithPictures("glitchList",glitchTally,"Player Name","Total Records","Nation");
-      displayTableWithPictures("noGlitchList",noGlitchTally,"Player Name","Total Records","Nation");
-      displayTableWithPictures("countryList",countryTally,"Country","Total Records","Flag");
-      displaySimpleTable("vehicleList",vehicleTally,"Vehicle","Total");
-      displaySimpleTable("characterList",characterTally,"Character","Total");
+        for (let j=0;j<results.length;j++) {
 
-      let yearSplit = splitNameQuantity(allYears);
-      displayBar("years",yearSplit[0],yearSplit[1]); //bar charts
-      displayBar("dates",getMonths(allDates),["Jan","Feb","Mar","Apr","May","June","July","Aug","Sep","Oct","Nov","Dec"]);
-      let localTime = document.createElement("p");
-      localTime.id = "totalTime";
-      localTime.appendChild(document.createTextNode("Database last updated: "+new Date(mainLB["lastUpdated"]).toLocaleString()));
-      document.body.appendChild(localTime);
-      createRedirect();
-    })})
-  })
-    .catch((err) => {
-      console.log(err);
-      console.log(`Internal Error Occured. Please try again at ${(new Date('August 28, 2024 22:00:00')).toLocaleTimeString()}`);
-  });
-}).catch((err) => {
-  console.log(err);
-  alert(`Internal Error Occured. Please try again at ${(new Date('August 28, 2024 22:00:00')).toLocaleTimeString()}`);
-})
-}) //tag closures from original fetch statement
-})}
+          let index = `${j}`;
+          let category = determineCategory(mainLB,j,index);
+          if (category==="Slower-Glitch") { //prevent slow glitches and slow shortcuts from displaying by not adding them to the fetch array
+            console.log(mainLB["leaderboards"][`${j}`]["name"] + " Slow glitch");
+            continue;
+          }
+
+          let row = myTable.insertRow();
+          let cell1 = row.insertCell(0), cell2 = row.insertCell(1),
+          cell3 = row.insertCell(2), cell4 = row.insertCell(3),
+          cell5 = row.insertCell(4), cell6 = row.insertCell(5),
+          cell7 = row.insertCell(6), cell8 = row.insertCell(7),
+          cell9 = row.insertCell(8), cell10 = row.insertCell(9),
+          cell11 = row.insertCell(10);
+          //One row and 11 columns for each track and category
+
+          if (results[index]["status"] === "rejected") {
+            //display generic track info with main leaderboard if a track leaderboard fails, restarts loop
+            cell1.innerHTML = mainLB["leaderboards"][`${j}`]["name"];
+            cell2.innerHTML = category;
+            cell3.innerHTML = mainLB["leaderboards"][`${j}`]["fastestTimeSimple"].slice(1);
+            cell4.innerHTML = "-";
+            cell5.innerHTML = "Failed";
+            cell6.innerHTML = "to";
+            cell7.innerHTML = "fetch";
+            cell8.innerHTML = "ghost";
+            cell9.innerHTML = "-";
+            cell10.innerHTML = mainLB["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10);
+            cell11.innerHTML = getRecordDuration(mainLB["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10));
+            console.log('Failed Fetching Record for: '+mainLB["leaderboards"][`${j}`]["name"]);
+            allRecords.push(mainLB["leaderboards"][`${j}`]["fastestTimeSimple"]);
+            continue;
+          }
+
+          let currentVehicle=getVehicle(results[index]["value"]["ghosts"]["0"]["vehicleId"]),
+          currentCharacter=getCharacter(results[index]["value"]["ghosts"]["0"]["driverId"]),
+          currentController=getController(results[index]["value"]["ghosts"]["0"]["controller"]),
+          recordDate = results[index]["value"]["ghosts"]["0"]["dateSet"].slice(0,10); //UTC Time Date
+          duration = getRecordDuration(recordDate);
+          //getting strings from switch case statements
+
+          let player = ["Unknown","images/unknown.png"];
+          for (let i=0;i<playersPage.length;i++) {
+            if (playersPage[i].playerID.includes(results[index]["value"]["ghosts"]["0"]["playerId"])) {
+             if (playersPage[i].playerName[0].length === 1) {
+               player = [playersPage[i].playerName,playersPage[i].countryID];
+              }
+              else {
+                player = [playersPage[i].playerName[0],playersPage[i].countryID];
+             }
+             break;
+            }
+          }
+
+          if (player[0]!="Unknown") {
+            //prevent unknown players from being added to player and nation stats table, ghost stats and main record table are still added
+            if (toBeAdded = addToArray(player[0],playerTally)) {
+              playerTally.push(new NameQuantityNode(player[0],1,player[1]))
+            }
+            if (toBeAdded = addToArray(player[1].slice(7,9),countryTally)) {
+              countryTally.push(new NameQuantityNode(player[1].slice(7,9),1,player[1]))
+            }
+            if (category==="Glitch" || category==="Shortcut") {
+              if (toBeAdded = addToArray(player[0],glitchTally)) {glitchTally.push(new NameQuantityNode(player[0],1,player[1]))}
+            }
+            else {
+              if (toBeAdded = addToArray(player[0],noGlitchTally)) {noGlitchTally.push(new NameQuantityNode(player[0],1,player[1]))}
+            }
+            screenName = player[0];
+          }
+          else {
+            console.log("Missing player entry at: "+results[index]["value"]["name"]+": "+category);
+            unknownPeople++; //used for percentage of players controller calculations
+            screenName = checkDefaultMii(results[index]["value"]["ghosts"]["0"]["player"]);
+          }
+
+          allDates.push(recordDate);
+          allRecords.push(results[index]["value"]["fastestTimeSimple"]);
+          orderedDuration.push(new NameQuantityNode(results[index]["value"]["name"]+": "+category,duration,recordDate,player[0]));
+
+          if (toBeAdded = addToArray(recordDate.slice(0,4),allYears)) {
+            allYears.push(new NameQuantityNode(recordDate.slice(0,4),1))
+          }
+          if (toBeAdded = addToArray(currentVehicle,vehicleTally)) {
+            vehicleTally.push(new NameQuantityNode(currentVehicle,1))
+          }
+          if (toBeAdded = addToArray(currentCharacter,characterTally)) {
+            characterTally.push(new NameQuantityNode(currentCharacter,1))
+          }
+
+          if (toBeAdded = addToArray(currentController,controllerTally)) {
+            controllerTally.push(new NameQuantityNode(currentController,1))
+          }
+          if (toBeAdded = addToArray(player[0],getControllerArray(currentController))) {
+            getControllerArray(currentController).push(new NameQuantityNode(player[0],1))
+          }
+          if (currentController==="Gamecube" && results[index]["value"]["ghosts"]["0"]["usbGcnAdapterAttached"]) {
+            currentController="USB Gamecube"; //switch to USB-GCN after stats collection
+          }
+          //add ghost data to arrays
+
+          cell1.innerHTML = results[index]["value"]["name"];
+          cell2.innerHTML = category;
+          //cell3.appendChild(createRKGDownload(results[index]["value"]["ghosts"],"0"));
+          cell3.innerHTML = results[index]["value"]["fastestTimeSimple"].slice(1); //removes initial 0
+          cell4.innerHTML = screenName;
+          cell5.innerHTML = checkDefaultMii(results[index]["value"]["ghosts"]["0"]["player"]);
+          cell6.appendChild(createImage(player[1]));
+          cell7.innerHTML = currentCharacter;
+          cell8.innerHTML = currentVehicle;
+          cell9.innerHTML = currentController;
+          cell10.innerHTML = recordDate;
+          cell11.innerHTML = duration;
+        }
+
+        //Begin Stats Section
+
+        orderedDuration.sort(sortNodeByQuantity); countryTally.sort(sortNodeByQuantity); 
+        vehicleTally.sort(sortNodeByQuantity); characterTally.sort(sortNodeByQuantity);
+        controllerTally.sort(sortNodeByQuantity); playerTally.sort(sortNodeByQuantity); 
+        glitchTally.sort(sortNodeByQuantity); noGlitchTally.sort(sortNodeByQuantity);
+        allYears.sort(sortNodeByName);
+
+        document.getElementById("totalPlayerCount").textContent=`Individual Record Holders: ${playerTally.length+unknownPeople}`;
+        document.getElementById("totalPlayerCountDupe").textContent=`Total Record Holders: ${playerTally.length+unknownPeople}`;
+        document.getElementById("totalTime").textContent=`Overall Combined Time: ${addGhostTimes(allRecords)}`;
+        document.getElementById("totalCount").textContent=`Total Records: ${allDates.length}`; 
+
+        displayPie("vehicle",vehicleTally);
+        displayPie("character",characterTally);
+        displayPie("controller",controllerTally);
+        displayPie("country",countryTally); //Pie charts
+
+        displayTopTen(orderedDuration);
+        displayControllerTable("controllerList",controllerTally,"Controller","Total Records","Percentage","% of Players",playerTally.length+unknownPeople,allDates.length);
+        displayTableWithPictures("playerList",playerTally,"Player Name","Total Records","Nation");
+        displayTableWithPictures("glitchList",glitchTally,"Player Name","Total Records","Nation");
+        displayTableWithPictures("noGlitchList",noGlitchTally,"Player Name","Total Records","Nation");
+        displayTableWithPictures("countryList",countryTally,"Country","Total Records","Flag");
+        displaySimpleTable("vehicleList",vehicleTally,"Vehicle","Total");
+        displaySimpleTable("characterList",characterTally,"Character","Total");
+
+        let yearSplit = splitNameQuantity(allYears);
+        displayBar("years",yearSplit[0],yearSplit[1]); //bar charts
+        displayBar("dates",getMonths(allDates),["Jan","Feb","Mar","Apr","May","June","July","Aug","Sep","Oct","Nov","Dec"]);
+        let localTime = document.createElement("p");
+        localTime.id = "totalTime";
+        localTime.appendChild(document.createTextNode("Database last updated: "+new Date(mainLB["lastUpdated"]).toLocaleString()));
+        document.body.appendChild(localTime);
+        createRedirect();
+        document.getElementById('loadingGIF').style.display = 'none';
+        })}) //players.json
+      }) //load 3
+    }).catch((err) => {console.log(err);
+      alert(`Internal Error Occured. Please try again at ${(new Date('August 28, 2024 22:00:00')).toLocaleTimeString()}`);
+    })}) //load2
+  })}) //load 1
+}
 
 
 /*****************************************************************************/
@@ -267,42 +280,42 @@ function PlayersPageAndPIDbyPlayerName() {
 
   fetch('./players.json').then(mainRes => {mainRes.json().then(playersPage => {this.playersPage = playersPage;
     for (let i=0;i<playersPage.length;i++) {
-      let array = playersPage[i].playerName;
+      let selectedPlayer = playersPage[i].playerName;
       if (playersPage[i].playerName[0].length === 1) { //playersPage[i].playerName[0].length = 1 when only 1 name is present and therefore not an array
-        array = playersPage[i].playerName.toUpperCase();
+        selectedPlayer = playersPage[i].playerName.toUpperCase();
       }
       else {
-        array = array.map(function(x) {return x.toUpperCase();})
+        selectedPlayer = selectedPlayer.map(function(x) {return x.toUpperCase();})
       }
-      if (array.includes(inputtedName.value.toUpperCase())) {
+      if (selectedPlayer.includes(inputtedName.value.toUpperCase())) {
         index = i;
         break;
       }
     }
 
-    let simpleDiv = document.createElement("div");
-    let urlDiv = document.createElement("div");
-    urlDiv.id = "d1";
-    simpleDiv.id = "d2";
+    let simplePlayerDiv = document.createElement("div"), 
+    urlPlayerDiv = document.createElement("div");
+    simplePlayerDiv.id = "d2";
+    urlPlayerDiv.id = "d1";
     if (index==0) {
-      urlDiv.appendChild(createHeaderTwo("Player not found"));
+      urlPlayerDiv.appendChild(createHeaderTwo("Player not found"));
     }
     else if (playersPage[index].playerID.length==16) { //playerID == 16 if only 1 playerID else it is a single digit
-      simpleDiv.appendChild(createHeaderTwo(playersPage[index].playerID));
-      urlDiv.appendChild(createHyperLink(`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID.slice(0,2)}/${playersPage[index].playerID.slice(2)}.html`));
+      simplePlayerDiv.appendChild(createHeaderTwo(playersPage[index].playerID));
+      urlPlayerDiv.appendChild(createHyperLink(`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID.slice(0,2)}/${playersPage[index].playerID.slice(2)}.html`));
     }
     else {
       for (let i=0;i<playersPage[index].playerID.length;i++) {
-        let id = createHeaderTwo(playersPage[index].playerID[i]);
-        id.style.color=chartColors[i+1];
-        simpleDiv.appendChild(id);
-        urlDiv.appendChild(createHyperLink(`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID[i].slice(0,2)}/${playersPage[index].playerID[i].slice(2)}.html`));
+        let selectedPlayerid = createHeaderTwo(playersPage[index].playerID[i]);
+        selectedPlayerid.style.color=chartColors[i+1];
+        simplePlayerDiv.appendChild(selectedPlayerid);
+        urlPlayerDiv.appendChild(createHyperLink(`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID[i].slice(0,2)}/${playersPage[index].playerID[i].slice(2)}.html`));
         let break1 = document.createElement("br");
-        urlDiv.appendChild(break1);
+        urlPlayerDiv.appendChild(break1);
       }
     }
-    document.body.appendChild(simpleDiv);
-    document.body.appendChild(urlDiv);
+    document.body.appendChild(simplePlayerDiv);
+    document.body.appendChild(urlPlayerDiv);
   })})
 }
 
@@ -310,6 +323,7 @@ function PlayersPageAndPIDbyPlayerName() {
 /*****************************************************************************/
 /*                              Top10 Main Func                              */
 /*****************************************************************************/
+
 
 //Searches once and then searches again, fetching this much data usually results in at least one fetch failing the first time
 function topsByPID() {
@@ -1146,8 +1160,8 @@ function displayPie(tableIndex,dataset) {
   }
 
   let options = {
-    chart: {type: 'pie'
-      ,width: 420
+    chart: {type: 'pie',
+      width: 420
     },
     colors: chartColors,
     labels: titles,
@@ -1437,7 +1451,6 @@ function localTrackNameTimeComparator(category,mainLB,ghostIndex,offset) {
                     && noShortcutCategoryIDs.includes(mainLB["leaderboards"][`${ghostIndex+1}`]["categoryId"])) {
       if (isSlowGlitch(mainLB["leaderboards"][`${ghostIndex}`]["fastestTimeSimple"],mainLB["leaderboards"][`${ghostIndex+1}`]["fastestTimeSimple"])) {return "Slower-Glitch";}
       else {return category;}
-
     }
   }
   if (ghostIndex<mainLB["leaderboards"].length-offset && mainLB["leaderboards"][`${ghostIndex}`]["name"] === mainLB["leaderboards"][`${ghostIndex+offset}`]["name"]) {
@@ -1496,9 +1509,11 @@ function determineCategory(mainLB,ghostIndex,ghostIndexStr) {
   else {return "Normal";}
 }
 
+
 /*****************************************************************************/
 /*                          Dark Mode Functionality                          */
 /*****************************************************************************/
+
 
 let darkModeText = document.getElementById("darkmode-text");
 
@@ -1528,11 +1543,13 @@ addEventListener("DOMContentLoaded", () => {
   }
 })
 
-let wheelPlayers = [], nunchukPlayers = [], classicPlayers = [], gamecubePlayers = [], usbgamecubePlayers = [];
 
 /*****************************************************************************/
 /*                          Switch Case Statments                            */
 /*****************************************************************************/
+
+
+let wheelPlayers = [], nunchukPlayers = [], classicPlayers = [], gamecubePlayers = [], usbgamecubePlayers = [];
 
 /** converts a rank to a color string
  * @param {Number} x 
