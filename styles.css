@@ -102,8 +102,8 @@ nav a.selected {
     right: 40px;
     font-size: 16px;
     font-weight: bold;
-    padding-right: 16px;
-    padding-left: 16px;
+    padding-right: 10px;
+    padding-left: 10px;
     border: none;
     border-radius: var(--rounded);
     cursor: pointer;
@@ -132,14 +132,13 @@ html[data-theme="dark"] .darkmode-toggle img {
     filter: invert(0);
 }
 
-
 .large-table {
     width: 100%;
 }
 
 .grid-container {
     display: inline-grid;
-    grid-template-columns: auto auto;column-gap: 150px;
+    grid-template-columns: auto auto;
 }
 
 .inner-grid {
@@ -151,4 +150,49 @@ html[data-theme="dark"] .darkmode-toggle img {
     display: inline-grid;
     grid-template-columns: auto auto auto;
     column-gap: 100px;
+}
+
+@media (max-width:1024px) {
+    * {
+        font-size: 18px;
+    }
+    body > header > nav > div > a {
+        padding: 10px;
+    }
+    nav {
+        justify-content: normal;
+    }
+    body > header > nav > img {
+        height: 66px;
+    }
+    body > button {
+        position: unset!important;
+    }
+    #main > tbody > tr > td:nth-child(5), #main > thead > tr > td:nth-child(5) {
+        display: none;
+    }
+}
+
+@media (max-width:768px) {
+    * {
+        font-size: 16px;
+    }
+    #main > tbody > tr > td:nth-child(11), #main > thead > tr > td:nth-child(11) {
+        display: none;
+    }
+}
+
+@media (max-width:425px) {
+    * {
+        font-size: 14px;
+    }
+    #main > tbody > tr > td:nth-child(6), #main > thead > tr > td:nth-child(6) {
+        display: none;
+    }
+    body > header > nav > img {
+        display: none;
+    }
+    body > header > nav > div > a {
+        padding: 5px;
+    }
 }
