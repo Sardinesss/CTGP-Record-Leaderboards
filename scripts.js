@@ -63,7 +63,9 @@ function loadLeaderboard(currentPage) {
   else if (currentPage==="recordstwo") {
     load1='./data/Backup_200CTGP.json', load2='./data/Records_200CTGP.json';
   }
-  else {
+  else { //Add warning about removal of coconut mall 200cc category
+    let CMwarning = document.createElement("p"); 
+    document.body.insertBefore(CMwarning.appendChild(document.createTextNode("Coconut Mall No-shortcut Record is not displayed because the leaderboard is heavily bugged.")),document.getElementById("mainText"));
     load1='./data/Backup_200Nin.json', load2='./data/Records_200Nin.json';
   }
   fetch(load1).then(mainRes => {mainRes.json().then(mainLB =>{this.mainLB = mainLB;
@@ -302,14 +304,14 @@ function PlayersPageAndPIDbyPlayerName() {
     }
     else if (playersPage[index].playerID.length==16) { //playerID == 16 if only 1 playerID else it is a single digit
       simplePlayerDiv.appendChild(createHeaderTwo(playersPage[index].playerID));
-      urlPlayerDiv.appendChild(createHyperLink(`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID.slice(0,2)}/${playersPage[index].playerID.slice(2)}.html`));
+      urlPlayerDiv.appendChild(createHyperLink(`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID.slice(0,2)}/${playersPage[index].playerID.slice(2)}.html`,`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID.slice(0,2)}/${playersPage[index].playerID.slice(2)}.html`));
     }
     else {
       for (let i=0;i<playersPage[index].playerID.length;i++) {
         let selectedPlayerid = createHeaderTwo(playersPage[index].playerID[i]);
         selectedPlayerid.style.color=chartColors[i+1];
         simplePlayerDiv.appendChild(selectedPlayerid);
-        urlPlayerDiv.appendChild(createHyperLink(`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID[i].slice(0,2)}/${playersPage[index].playerID[i].slice(2)}.html`));
+        urlPlayerDiv.appendChild(createHyperLink(`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID[i].slice(0,2)}/${playersPage[index].playerID[i].slice(2)}.html`,`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID.slice(0,2)}/${playersPage[index].playerID.slice(2)}.html`));
         let break1 = document.createElement("br");
         urlPlayerDiv.appendChild(break1);
       }
@@ -641,6 +643,12 @@ let headerInfo = {
 
 /** create html elements common across all leaderboards */
 function buildRecordWebpage() {
+  let instructions = document.createElement("p");
+  instructions.appendChild(document.createTextNode("Leaderboard should load instantly, but sometimes leaderboards will need to be gotten when the site is loaded. The loading animation will automatically hide when the table is populated. Glitches and shortcuts which are slower than normal have been ignored on the leaderboard. Some leaderboards may have unintential shortcuts but are still classified as normal. A search feature is available to filter certain columns. Namely: Track Name, Category, Player Name, Mii, Character, Vehicle, Controller,and Date. Choosing Exclusive Search will match only values begining with what is inputted in the search bar. Stats are tracked below the main records table. Stats included are:"));
+  //instructions.appendChild(createHyperLink("#longList","Top 10 Longest Standing Records"));
+  //instructions.appendChild(createHyperLink("#playerList","Player Stats"));
+  //instructions.appendChild(createHyperLink("#vehicleList","Ghost Stats"));
+  document.body.insertBefore(instructions,document.getElementById("mainText"));
   document.body.appendChild(createTable("main"));
   let break1 = document.createElement("br");
   document.body.appendChild(break1);
@@ -797,10 +805,11 @@ function createImage(pictureName) {
 
 /** creates a type html object, can be used for internal or external hyperlinks
  * @param {String} link 
+ * @param {String} text 
  * @returns */
-function createHyperLink(link) {
+function createHyperLink(link,text) {
   let redirect = document.createElement("a");
-  redirect.appendChild(document.createTextNode(link));
+  redirect.appendChild(document.createTextNode(text));
   redirect.href = link;
   return redirect;
 }
@@ -906,72 +915,29 @@ function createTableHeader11(row,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11) {
 /** Html Table Search Function */
 function searchTable() {
   // Declare variables
-  let input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("myInput");
+  const searchableColumns = [0,1,3,4,6,7,8,9]; //Track Name, Category, Player Name, Mii, Character, Vehicle, Controller, Date
+  let input, filter, table, tableRow, exclusive, cellData, txtValue;
+  input = document.getElementById("myInput"); //text
   filter = input.value.toUpperCase();
   table = document.getElementById("main");
-  tr = table.getElementsByTagName("tr");
+  tableRow = table.getElementsByTagName("tr");
+  exclusive = document.getElementById("exclusiveCheck"); //checkbox
 
   // Loop through all table rows, and hide those who don't match the search query
-  for (i = 1; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-        continue;
-      } else {
-        tr[i].style.display = "none";
+  for (let i = 1; i < tableRow.length; i++) {
+    for (let z = 0; z < searchableColumns.length; z++) {
+      cellData = tableRow[i].getElementsByTagName("td")[searchableColumns[z]];
+      txtValue = cellData.textContent || cellData.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1 && !exclusive.checked) {
+        tableRow[i].style.display = ""; //reset display style when needed
+        break;
       }
-    }
-    td = tr[i].getElementsByTagName("td")[1];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-        continue;
-      } else {
-        tr[i].style.display = "none";
+      if (txtValue.toUpperCase().indexOf(filter) === 0 && exclusive.checked) {
+        tableRow[i].style.display = ""; //reset display style when needed
+        break;
       }
-    }
-    td = tr[i].getElementsByTagName("td")[3];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-        continue;
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-    td = tr[i].getElementsByTagName("td")[6];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-        continue;
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-    td = tr[i].getElementsByTagName("td")[7];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-        continue;
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-    td = tr[i].getElementsByTagName("td")[8];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-        continue;
-      } else {
-        tr[i].style.display = "none";
+      else {
+        tableRow[i].style.display = "none";
       }
     }
   }
