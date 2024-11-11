@@ -67,7 +67,7 @@ function loadLeaderboard(currentPage) {
   else { //Add warning about removal of coconut mall 200cc category
     let CMwarning = document.createElement("p"); 
     document.body.insertBefore(CMwarning.appendChild(document.createTextNode("Coconut Mall No-shortcut Record is not displayed because the leaderboard is heavily bugged.")),document.getElementById("mainText"));
-    load1='./data/Backup_200Nin.json', load2='./data/Records_200Nin.json';
+    load1='./data/Backup_200NIN.json', load2='./data/Records_200NIN.json';
   }
   fetch(load1).then(mainRes => {mainRes.json().then(mainLB =>{this.mainLB = mainLB;
 
