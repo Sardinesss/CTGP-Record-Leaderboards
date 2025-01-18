@@ -157,9 +157,10 @@ function loadLeaderboard(currentPage) {
              }
              break;
             }
+            player[0]=`${results[index]["value"]["ghosts"]["0"]["playerId"]}`;
           }
 
-          if (player[0]!="Unknown") {
+          if (player[1]!="images/unknown.png") {
             //prevent unknown players from being added to player and nation stats table, ghost stats and main record table are still added
             if (toBeAdded = addToArray(player[0],playerTally)) {
               playerTally.push(new NameQuantityNode(player[0],1,player[1]))
@@ -1194,8 +1195,10 @@ function displayBar(tableIndex,dataset,x) {
  * @param {Array} dataset controllerTally
  * @param {string} title1 Controller
  * @param {string} title2 Total Records
- * @param {string} title3 % of Unique Players
- * @param {Number} totalPlayers playerTally.length */
+ * @param {string} title3 Percentage
+ * @param {string} title4 % of Players
+ * @param {Number} totalPlayers playerTally.length + unknownPeople
+ * @param {Number} totalRecords allDates.length */
 function displayControllerTable(tableName,dataset,title1,title2,title3,title4,totalPlayers,totalRecords) {
   let infoTitle = document.getElementById(tableName).getElementsByTagName('thead')[0];
   let titleRow = infoTitle.insertRow();
@@ -1206,7 +1209,7 @@ function displayControllerTable(tableName,dataset,title1,title2,title3,title4,to
   cellt4.innerHTML=title4;
   let infoList = document.getElementById(tableName).getElementsByTagName('tbody')[0];
   let playerIndex = 0; originalLength = dataset.length;
-  let multiControllerPlayers = 0;
+  let playersInControllerDataset = 0;
 
   for (let l=0;l<originalLength;l++) {
     let dataRow = infoList.insertRow();
@@ -1221,14 +1224,14 @@ function displayControllerTable(tableName,dataset,title1,title2,title3,title4,to
     cell2.innerHTML = dataset[playerIndex].getQuantity();
     cell3.innerHTML = `${((dataset[playerIndex].getQuantity()/totalRecords) * 100).toFixed(1)}%`;
     cell4.innerHTML = `${(((getControllerArray(dataset[playerIndex].getName()).length)/totalPlayers) * 100).toFixed(1)}%`; //controller Total/player total times 100, round to 1 decimal point
-    multiControllerPlayers+=getControllerArray(dataset[playerIndex].getName()).length;
+    playersInControllerDataset+=getControllerArray(dataset[playerIndex].getName()).length;
     dataset.splice(playerIndex,1); //remove displayed table element
     playerIndex = 0;
   }
   
   let dataRow = infoList.insertRow();
   let finalCell = dataRow.insertCell(0);
-  finalCell.innerHTML = `Number of players holding records with multiple controllers: ${multiControllerPlayers-totalPlayers}`;
+  finalCell.innerHTML = `Number of players holding records with multiple controllers: ${playersInControllerDataset-totalPlayers}`;
   finalCell.colSpan = 4;
 }
 
