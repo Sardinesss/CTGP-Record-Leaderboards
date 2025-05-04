@@ -99,7 +99,7 @@ function loadLeaderboard(currentPage) {
         let myTable = document.getElementById("main").getElementsByTagName('tbody')[0];
         //create header row and initiate first body row
 
-        let screenName = '', unknownPeople = 0, allDates = [], allYears = [], allRecords = [],
+        let screenName = '', unknownPeopleCount = 0, unknownPeopleIDs = [], allDates = [], allYears = [], allRecords = [],
         vehicleTally = [], characterTally = [], controllerTally = [], playerTally = [], 
         glitchTally = [], noGlitchTally = [], countryTally = [], orderedDuration = [];
 
@@ -178,7 +178,13 @@ function loadLeaderboard(currentPage) {
           }
           else {
             console.log("Missing player entry at: "+results[index]["value"]["name"]+": "+category);
-            unknownPeople++; //used for percentage of players controller calculations
+            if (unknownPeopleIDs.includes(player[0])) {
+              console.log('Repeat unknown playerID')
+            }
+            else {
+              unknownPeopleIDs+=player[0];
+              unknownPeopleCount++;
+            }
             screenName = checkDefaultMii(results[index]["value"]["ghosts"]["0"]["player"]);
           }
 
@@ -229,8 +235,8 @@ function loadLeaderboard(currentPage) {
         glitchTally.sort(sortNodeByQuantity); noGlitchTally.sort(sortNodeByQuantity);
         allYears.sort(sortNodeByName);
 
-        document.getElementById("totalPlayerCount").textContent=`Individual Record Holders: ${playerTally.length+unknownPeople}`;
-        document.getElementById("totalPlayerCountDupe").textContent=`Total Record Holders: ${playerTally.length+unknownPeople}`;
+        document.getElementById("totalPlayerCount").textContent=`Individual Record Holders: ${playerTally.length+unknownPeopleCount}`;
+        document.getElementById("totalPlayerCountDupe").textContent=`Total Record Holders: ${playerTally.length+unknownPeopleCount}`;
         document.getElementById("totalTime").textContent=`Overall Combined Time: ${addGhostTimes(allRecords)}`;
         document.getElementById("totalCount").textContent=`Total Records: ${allDates.length}`; 
 
@@ -240,7 +246,7 @@ function loadLeaderboard(currentPage) {
         displayPie("country",countryTally); //Pie charts
 
         displayTopTen(orderedDuration);
-        displayControllerTable("controllerList",controllerTally,"Controller","Total Records","Percentage","% of Players",playerTally.length+unknownPeople,allDates.length);
+        displayControllerTable("controllerList",controllerTally,"Controller","Total Records","Percentage","% of Players",playerTally.length+unknownPeopleCount,allDates.length);
         displayTableWithPictures("playerList",playerTally,"Player Name","Total Records","Nation");
         displayTableWithPictures("glitchList",glitchTally,"Player Name","Total Records","Nation");
         displayTableWithPictures("noGlitchList",noGlitchTally,"Player Name","Total Records","Nation");
@@ -1197,7 +1203,7 @@ function displayBar(tableIndex,dataset,x) {
  * @param {string} title2 Total Records
  * @param {string} title3 Percentage
  * @param {string} title4 % of Players
- * @param {Number} totalPlayers playerTally.length + unknownPeople
+ * @param {Number} totalPlayers playerTally.length + unknownPeopleCount
  * @param {Number} totalRecords allDates.length */
 function displayControllerTable(tableName,dataset,title1,title2,title3,title4,totalPlayers,totalRecords) {
   let infoTitle = document.getElementById(tableName).getElementsByTagName('thead')[0];
