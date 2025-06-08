@@ -689,9 +689,6 @@ function buildRecordWebpage() {
   mainDiv.appendChild(createTableChartDiv("vehicle"));
   controllerDiv = document.createElement("div");
   controllerDiv.appendChild(createHeaderTwo(tableInfo["controller"]["header"]));
-  let controllerWarning = document.createElement("p");
-  controllerWarning.appendChild(document.createTextNode("Player Percentage column will total more than 100% when a player has multiple records with different controllers."));
-  controllerDiv.appendChild(controllerWarning);
   let subdiv = document.createElement("div");
   subdiv.className = "inner-grid";
   subdiv.appendChild(createChart("controller"));
@@ -722,6 +719,7 @@ function buildRecordWebpage() {
   headerDiv.appendChild(createHeaderTwo("Records by Year and Month"));
   chronoDiv.appendChild(headerDiv);
   datesDiv = document.createElement("div");
+  datesDiv.id= "datesDiv";
   datesDiv.appendChild(createChart("dates"));
   chronoDiv.appendChild(datesDiv);
   document.body.appendChild(chronoDiv);
