@@ -152,7 +152,16 @@ html[data-theme="dark"] .darkmode-toggle img {
     column-gap: 100px;
 }
 
-@media (max-width:1024px) {
+@media (max-width:1410px) {
+    .grid-container {
+        display: block;
+    }
+    #datesDiv {
+        display: none;
+    }
+}
+
+@media (max-width:1132px) {
     * {
         font-size: 18px;
     }
@@ -171,22 +180,31 @@ html[data-theme="dark"] .darkmode-toggle img {
     #main > tbody > tr > td:nth-child(5), #main > thead > tr > td:nth-child(5) {
         display: none;
     }
+    nav div {
+        margin: 0px;
+    }
 }
 
-@media (max-width:768px) {
+@media (max-width:905px) {
     * {
         font-size: 16px;
     }
     #main > tbody > tr > td:nth-child(11), #main > thead > tr > td:nth-child(11) {
         display: none;
     }
+    .triple-grid {
+        column-gap: 25px;
+    }
 }
 
-@media (max-width:425px) {
+@media (max-width:755px) {
     * {
         font-size: 14px;
     }
     #main > tbody > tr > td:nth-child(6), #main > thead > tr > td:nth-child(6) {
+        display: none;
+    }
+    #controllerList > tbody > tr > td:nth-child(4), #controllerList > thead > tr > td:nth-child(4) {
         display: none;
     }
     body > header > nav > img {
