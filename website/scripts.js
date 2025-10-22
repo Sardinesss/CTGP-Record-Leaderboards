@@ -1233,10 +1233,37 @@ function displayControllerTable(tableName,dataset,title1,title2,title3,title4,to
     playerIndex = 0;
   }
   
-  let dataRow = infoList.insertRow();
-  let finalCell = dataRow.insertCell(0);
-  finalCell.innerHTML = `Number of players holding records with multiple controllers: ${playersInControllerDataset-totalPlayers}`;
-  finalCell.colSpan = 4;
+  const allControllerArrays = [getControllerArray(0), getControllerArray(1), getControllerArray(2), getControllerArray(3)];
+  const elementMap = new Map();
+
+  allControllerArrays.forEach((arr, arrayIndex) => {
+    arr.forEach(inner => {
+      const key = inner.name;
+
+      if (!elementMap.has(key)) {elementMap.set(key, new Set());}
+
+      elementMap.get(key).add(arrayIndex);
+    });
+  });
+
+  const duplicates = [];
+  elementMap.forEach((indexSet, key) => {
+
+    if (indexSet.size > 1) {duplicates.push(key);}
+
+  });
+
+  let controllerTextRow = infoList.insertRow();
+  let controllerTextCell = controllerTextRow.insertCell(0);
+  controllerTextCell.innerHTML = `Number of players holding records with multiple controllers: ${playersInControllerDataset-totalPlayers}`;
+  controllerTextCell.colSpan = 4;
+
+  if (duplicates.length>0) {
+    let finalDataRow = infoList.insertRow();
+    let finalCell = finalDataRow.insertCell(0);
+    finalCell.innerHTML = `Players: ${duplicates.sort()}`;
+    finalCell.colSpan = 4;
+  }
 }
 
 /** used for vehicle/character/controller tables, 
@@ -1552,11 +1579,15 @@ function getController(x) {
  * @returns controller string */
 function getControllerArray(x) {
   switch (x) {
-    case "Wii Wheel": return wheelPlayers;
-    case "Nunchuk": return nunchukPlayers;
-    case "Classic": return classicPlayers;
-    case "Gamecube": return gamecubePlayers;
-    case "USB Gamecube": return usbgamecubePlayers;
+    case "Wii Wheel": 
+    case 0: return wheelPlayers;
+    case "Nunchuk": 
+    case 1: return nunchukPlayers;
+    case "Classic": 
+    case 2: return classicPlayers;
+    case "Gamecube": 
+    case 3: return gamecubePlayers;
+    case "USB Gamecube": return usbgamecubePlayers; /* Not Used */
 }}
 
 /** converts vehicleId (int) to a vehicle name; karts 0-17; bikes 18-35
