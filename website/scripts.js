@@ -1505,6 +1505,10 @@ function determineCategory(mainLB,ghostIndex,ghostIndexStr) {
       return "Normal";
     }
 
+    if (mainLB["leaderboards"][ghostIndexStr]["categoryId"] === 7) {
+      return "TAS";
+    }
+
     return "None"; //should never trigger, all current categoryIds are accounted for
   }
   else {return "Normal";}
