@@ -316,10 +316,11 @@ function PlayersPageAndPIDbyPlayerName() {
     }
     else {
       for (let i=0;i<playersPage[index].playerID.length;i++) {
+        /* Loop through player Ids and create unique links */
         let selectedPlayerid = createHeaderTwo(playersPage[index].playerID[i]);
         selectedPlayerid.style.color=chartColors[i+1];
         simplePlayerDiv.appendChild(selectedPlayerid);
-        urlPlayerDiv.appendChild(createHyperLink(`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID[i].slice(0,2)}/${playersPage[index].playerID[i].slice(2)}.html`,`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID.slice(0,2)}/${playersPage[index].playerID.slice(2)}.html`));
+        urlPlayerDiv.appendChild(createHyperLink(`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID[i].slice(0,2)}/${playersPage[index].playerID[i].slice(2)}.html`,`https://www.chadsoft.co.uk/time-trials/players/${playersPage[index].playerID[i].slice(0,2)}/${playersPage[index].playerID[i].slice(2)}.html`));
         let break1 = document.createElement("br");
         urlPlayerDiv.appendChild(break1);
       }
