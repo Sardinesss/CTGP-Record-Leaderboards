@@ -316,6 +316,7 @@ function PlayersPageAndPIDbyPlayerName() {
     }
     else {
       for (let i=0;i<playersPage[index].playerID.length;i++) {
+        /* Loop through player Ids and create unique links */
         let selectedPlayerid = createHeaderTwo(playersPage[index].playerID[i]);
         selectedPlayerid.style.color=chartColors[i+1];
         simplePlayerDiv.appendChild(selectedPlayerid);
