@@ -59,17 +59,17 @@ function loadLeaderboard(currentPage) {
   buildRecordWebpage();
   let load1, load2;
   if (currentPage==="records") {
-    load1='./data/Backup_150CTGP.json', load2='./data/Records_150CTGP.json';
+    load1='./data/Main_150CTGP.json', load2='./data/Records_150CTGP.json';
   }
   else if (currentPage==="recordstwo") {
-    load1='./data/Backup_200CTGP.json', load2='./data/Records_200CTGP.json';
+    load1='./data/Main_200CTGP.json', load2='./data/Records_200CTGP.json';
   }
   else { //Add warning about removal of coconut mall 200cc category
     let CMwarning = document.createElement("p"); 
     document.body.insertBefore(CMwarning.appendChild(document.createTextNode("Coconut Mall No-shortcut Record is not displayed because the leaderboard is heavily bugged.")),document.getElementById("mainText"));
-    load1='./data/Backup_200NIN.json', load2='./data/Records_200NIN.json';
+    load1='./data/Main_200NIN.json', load2='./data/Records_200NIN.json';
   }
-  fetch(load1).then(mainRes => {mainRes.json().then(backupLB =>{this.backupLB = backupLB;
+  fetch(load1).then(mainRes => {mainRes.json().then(mainLB =>{this.mainLB = mainLB;
 
     fetch(load2).then(mainRes => {mainRes.json().then(results => {this.results = results;
 
@@ -78,19 +78,19 @@ function loadLeaderboard(currentPage) {
       for (let a=0;a<results.length;a++) {
         //first check latest fetch
         if (results[`${a}`]["status"] === "rejected") {
-          //then previous fetch
-          if (backupLB[`${a}`]["status"] === "rejected") {
+          /*then previous fetch
+          if (backupLB[`${a}`]["status"] === "rejected") {*/
             failedIndices.push(a);
-          }
+          /*}
           else {
             results[a] = backupLB[a];
-          }
+          }*/
         }
       }
 
       //build a new fetch for only fails
       for (let b=0;b<failedIndices.length;b++) {
-        load3.push("https://tt.chadsoft.co.uk" + results["leaderboards"][failedIndices[b]]["_links"]["item"]["href"]+'?limit=1');
+        load3.push("https://tt.chadsoft.co.uk" + mainLB["leaderboards"][failedIndices[b]]["_links"]["item"]["href"]+'?limit=1');
       }
       let fetches = load3.map(url => fetch(url).then(res => res.json()));
 
@@ -110,12 +110,12 @@ function loadLeaderboard(currentPage) {
         vehicleTally = [], characterTally = [], controllerTally = [], playerTally = [], 
         glitchTally = [], noGlitchTally = [], countryTally = [], orderedDuration = [];
 
-        for (let j=0;j<results.length;j++) {
+        for (let j=0;j<mainLB.length;j++) {
 
           let index = `${j}`;
-          let category = determineCategory(results,j,index);
+          let category = determineCategory(mainLB,j,index);
           if (category==="Slower-Glitch") { //prevent slow glitches and slow shortcuts from displaying by not adding them to the fetch array
-            console.log(results["leaderboards"][`${j}`]["name"] + " Slow glitch");
+            console.log(mainLB["leaderboards"][`${j}`]["name"] + " Slow glitch");
             continue;
           }
 
@@ -130,19 +130,19 @@ function loadLeaderboard(currentPage) {
 
           if (results[index]["status"] === "rejected") {
             //display generic track info with main leaderboard if a track leaderboard fails, restarts loop
-            cell1.innerHTML = results["leaderboards"][`${j}`]["name"];
+            cell1.innerHTML = mainLB["leaderboards"][`${j}`]["name"];
             cell2.innerHTML = category;
-            cell3.innerHTML = results["leaderboards"][`${j}`]["fastestTimeSimple"].slice(1);
+            cell3.innerHTML = mainLB["leaderboards"][`${j}`]["fastestTimeSimple"].slice(1);
             cell4.innerHTML = "-";
             cell5.innerHTML = "Failed";
             cell6.innerHTML = "to";
             cell7.innerHTML = "fetch";
             cell8.innerHTML = "ghost";
             cell9.innerHTML = "-";
-            cell10.innerHTML = results["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10);
-            cell11.innerHTML = getRecordDuration(results["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10));
-            console.log('Failed Fetching Record for: '+results["leaderboards"][`${j}`]["name"]);
-            allRecords.push(results["leaderboards"][`${j}`]["fastestTimeSimple"]);
+            cell10.innerHTML = mainLB["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10);
+            cell11.innerHTML = getRecordDuration(mainLB["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10));
+            console.log('Failed Fetching Record for: '+mainLB["leaderboards"][`${j}`]["name"]);
+            allRecords.push(mainLB["leaderboards"][`${j}`]["fastestTimeSimple"]);
             continue;
           }
 
@@ -266,7 +266,7 @@ function loadLeaderboard(currentPage) {
         displayBar("dates",getMonths(allDates),["Jan","Feb","Mar","Apr","May","June","July","Aug","Sep","Oct","Nov","Dec"]);
         let localTime = document.createElement("p");
         localTime.id = "totalTime";
-        localTime.appendChild(document.createTextNode("Database last updated: "+new Date(results["lastUpdated"]).toLocaleString()));
+        localTime.appendChild(document.createTextNode("Database last updated: "+new Date(mainLB["lastUpdated"]).toLocaleString()));
         document.body.appendChild(localTime);
         createRedirect();
         document.getElementById('loadingGIF').style.display = 'none';
