@@ -65,6 +65,20 @@ leaderboards.forEach(async (leaderboard) => {
     }
   }
 
+  const mainJson = {
+    leaderboards: data["leaderboards"],
+    lastUpdated: new Date()
+  };
+
+  const mainFilename = `Main_${leaderboard.name}.json`;
+  fs.writeFile(mainFilename, JSON.stringify(mainJson), (err) => {
+    if (err) {
+      console.error(`Failed to create ${mainFilename}:`, err);
+    } else {
+      console.log(`${mainFilename} created successfully.`);
+    }
+  });
+
   const recordsFilename = `Records_${leaderboard.name}.json`;
   fs.writeFile(recordsFilename, JSON.stringify(results), (err) => {
     if (err) {

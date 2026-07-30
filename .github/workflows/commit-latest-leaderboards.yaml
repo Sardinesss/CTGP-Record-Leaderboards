@@ -49,6 +49,9 @@ jobs:
         mv Records_200CTGP.json data/Records_200CTGP.json
         mv data/Records_200NIN.json data/Backup_200NIN.json
         mv Records_200NIN.json data/Records_200NIN.json
+        mv Main_150CTGP.json data/Main_150CTGP.json
+        mv Main_200CTGP.json data/Main_200CTGP.json
+        mv Main_200NIN.json data/Main_200NIN.json
         git add --all
         git commit -m "Update leaderboards - $(date '+%Y-%m-%d %H:%M') UTC"
         git push origin HEAD:gh-pages
