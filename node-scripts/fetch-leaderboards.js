@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // Maximum number of times to retry a failed fetch
-const FETCH_RETRIES_MAX = 3;
+const FETCH_RETRIES_MAX = 5;
 
 let leaderboards = [
   {
@@ -64,20 +64,6 @@ leaderboards.forEach(async (leaderboard) => {
       console.log(`${rejectedResults.length} ${leaderboard.name} leaderboards failed to fetch after ${FETCH_RETRIES_MAX} attempts.`);
     }
   }
-
-  const backupJson = {
-    leaderboards: data["leaderboards"],
-    lastUpdated: new Date()
-  };
-
-  const backupFilename = `Backup_${leaderboard.name}.json`;
-  fs.writeFile(backupFilename, JSON.stringify(backupJson), (err) => {
-    if (err) {
-      console.error(`Failed to create ${backupFilename}:`, err);
-    } else {
-      console.log(`${backupFilename} created successfully.`);
-    }
-  });
 
   const recordsFilename = `Records_${leaderboard.name}.json`;
   fs.writeFile(recordsFilename, JSON.stringify(results), (err) => {
