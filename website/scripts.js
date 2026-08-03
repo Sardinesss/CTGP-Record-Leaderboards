@@ -93,6 +93,7 @@ function loadLeaderboard(currentPage) {
         load3.push("https://tt.chadsoft.co.uk" + mainLB["leaderboards"][failedIndices[b]]["_links"]["item"]["href"]+'?limit=1');
       }
       let fetches = load3.map(url => fetch(url).then(res => res.json()));
+      console.log(`Missing ${fetches.length} records from backups.`);
 
       Promise.allSettled(fetches).then((supplementLB) => {
         for (let c=0;c<failedIndices.length;c++) {
@@ -110,17 +111,17 @@ function loadLeaderboard(currentPage) {
         vehicleTally = [], characterTally = [], controllerTally = [], playerTally = [], 
         glitchTally = [], noGlitchTally = [], countryTally = [], orderedDuration = [];
 
-        for (let j=0;j<mainLB.length;j++) {
+        for (let j=0;j<results.length;j++) {
 
           let index = `${j}`;
           let category = determineCategory(mainLB,j,index);
-          if (category==="Slower-Glitch") { //prevent slow glitches and slow shortcuts from displaying by not adding them to the fetch array
-            console.log(mainLB["leaderboards"][`${j}`]["name"] + " Slow glitch");
+          if (category==="Slower-Glitch" || category==="TAS") { //prevent slow glitches, slow shortcuts, or TASes (Tool Assisted Speedrun) from displaying by not adding them to the fetch array
+            console.log(mainLB["leaderboards"][`${j}`]["name"] + ` ${category}` + " removed from display");
             continue;
           }
 
-          let row = myTable.insertRow();
-          let cell1 = row.insertCell(0), cell2 = row.insertCell(1),
+          let row = myTable.insertRow(), duration = getRecordDuration(mainLB["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10)),
+          cell1 = row.insertCell(0), cell2 = row.insertCell(1),
           cell3 = row.insertCell(2), cell4 = row.insertCell(3),
           cell5 = row.insertCell(4), cell6 = row.insertCell(5),
           cell7 = row.insertCell(6), cell8 = row.insertCell(7),
@@ -140,7 +141,7 @@ function loadLeaderboard(currentPage) {
             cell8.innerHTML = "ghost";
             cell9.innerHTML = "-";
             cell10.innerHTML = mainLB["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10);
-            cell11.innerHTML = getRecordDuration(mainLB["leaderboards"][`${j}`]["fastestTimeLastChange"].slice(0,10));
+            cell11.innerHTML = duration;
             console.log('Failed Fetching Record for: '+mainLB["leaderboards"][`${j}`]["name"]);
             allRecords.push(mainLB["leaderboards"][`${j}`]["fastestTimeSimple"]);
             continue;
@@ -150,7 +151,6 @@ function loadLeaderboard(currentPage) {
           currentCharacter=getCharacter(results[index]["value"]["ghosts"]["0"]["driverId"]),
           currentController=getController(results[index]["value"]["ghosts"]["0"]["controller"]),
           recordDate = results[index]["value"]["ghosts"]["0"]["dateSet"].slice(0,10); //UTC Time Date
-          duration = getRecordDuration(recordDate);
           //getting strings from switch case statements
 
           let player = ["Unknown","images/unknown.png"];
@@ -184,9 +184,9 @@ function loadLeaderboard(currentPage) {
             screenName = player[0];
           }
           else {
-            console.log("Missing player entry at: "+results[index]["value"]["name"]+": "+category);
+            console.log("Missing player entry at: "+results[index]["value"]["name"]+": "+category +`- ${player[0]}`);
             if (unknownPeopleIDs.includes(player[0])) {
-              console.log('Repeat unknown playerID')
+              console.log(`Repeated unknown playerID - ${player[0]}`);
             }
             else {
               unknownPeopleIDs+=player[0];
