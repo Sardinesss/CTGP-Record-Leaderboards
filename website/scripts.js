@@ -184,7 +184,7 @@ function loadLeaderboard(currentPage) {
             screenName = player[0];
           }
           else {
-            console.log("Missing player entry at: "+results[index]["value"]["name"]+": "+category +`- ${player[0]}`);
+            console.log("Missing player entry at: "+results[index]["value"]["name"]+" - "+category +` - ${player[0]}`);
             if (unknownPeopleIDs.includes(player[0])) {
               console.log(`Repeated unknown playerID - ${player[0]}`);
             }
@@ -745,6 +745,7 @@ function createPageHeader(currentPage) {
   let funkyImage = createImage("images/funky.webp");
   funkyImage.height = 100;
   funkyImage.width = 112.78;
+  funkyImage.alt = "Funky Kong";
   navBar.appendChild(funkyImage);
   navDiv = document.createElement("div");
   redirectList = createHeaderHyperLinks(currentPage);
@@ -814,6 +815,7 @@ function createImage(pictureName) {
   let image = document.createElement('img');
   image.src = pictureName;
   image.width = 32;
+  image.alt = pictureName.split('/').pop().split('.')[0] + "Country";
   return image;
 }
 
