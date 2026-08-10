@@ -815,7 +815,7 @@ function createImage(pictureName) {
   let image = document.createElement('img');
   image.src = pictureName;
   image.width = 32;
-  image.alt = pictureName.split('/').pop().split('.')[0] + "Country";
+  image.alt = pictureName.split('/').pop().split('.')[0] + " Country";
   return image;
 }
 
@@ -1129,6 +1129,7 @@ function calculateDifference(recordTime,nonRecordTime) {
   return "+"+minutes+":"+seconds+"."+milliseconds;
 }
 
+/* Update for ADA */
 let chartColors = ['#3498DB', '#F39C12', '#8E44AD','#7F8C8D','#E74C3C','#27AE60','#34495E','#F7C003','#1d32a3','#6E6696','#7C5C3C','#CD0027'];
 
 /** creates pie chart
@@ -1566,6 +1567,7 @@ addEventListener("DOMContentLoaded", () => {
 
 let wheelPlayers = [], nunchukPlayers = [], classicPlayers = [], gamecubePlayers = [], usbgamecubePlayers = [];
 
+/* Update for ADA */
 /** converts a rank to a color string
  * @param {Number} x 
  * @returns controller string */
