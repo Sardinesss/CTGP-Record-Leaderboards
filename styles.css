@@ -3,7 +3,7 @@
     font-size: 20px;
     --text-color: black;
     --background-color: #eae3e7;
-    --primary-color: #3d85c6;
+    --primary-color: #357AB6;
     --primary-color-hover: #357AB6;
     --primary-color-darker: #1f5f97;
     --secondary-color: #cc4a40;
@@ -12,6 +12,13 @@
     --transition-duration: 0.1s;
     --semi-bold: 500;
     --rounded: 5px;
+}
+
+.search-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
 }
 
 html[data-theme="dark"] {

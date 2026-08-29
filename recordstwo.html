@@ -25,7 +25,10 @@
             <a href="#playerList">Player Stats</a><br>
             <a href="#vehicleList">Ghost Stats</a>
         </p>
-        <input type="text" id="myInput" onkeyup="searchTable()" placeholder="Search">
+        <div class="search-box">
+            <label for="myInput">Search</label>
+            <input type="text" id="myInput" onkeyup="searchTable()" placeholder="Start typing...">
+        </div>
         <input type="checkbox" id="exclusiveCheck" onclick="searchTable()">
         <label for="exclusiveCheck">Exclusive Search?</label>
         <img src="images/loading.gif" id="loadingGIF" alt="Loading GIF" style="width:256px;height:256px;">
