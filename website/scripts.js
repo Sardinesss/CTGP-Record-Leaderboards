@@ -756,6 +756,7 @@ function createPageHeader(currentPage) {
   let warioImage = createImage("images/wario.webp");
   warioImage.height = 100;
   warioImage.width = 83.05;
+  warioImage.alt = "Wario";
   navBar.appendChild(warioImage);
   header[0].appendChild(navBar);
   header[0].appendChild(document.createElement("hr"));
